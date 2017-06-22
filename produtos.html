@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title></title>
+    <head>
+    <title>Produtos</title>
     <meta charset="utf-8" />
     <!-- Stylesheets -->
     <link rel="stylesheet" href="css/photon.css">
@@ -10,21 +10,20 @@
     <!-- Electron Javascript -->
     <script src="app.js" charset="utf-8"></script>
   </head>
-
   <body>
-    <div class="window">
+          <div class="window">
       <header class="toolbar toolbar-header">
         <h1 class="title">Sistema de Vendas</h1>
       </header>
       <div class="window-content">
         <div class="pane-group">
           <div class="pane-sm sidebar">
-              <nav class="nav-group">
-              <a href="index.html" class="nav-group-item active">
+            <nav class="nav-group">
+              <a href="index.html" class="nav-group-item">
                 <span class="icon icon-home"></span>
                 Clientes
               </a>
-              <a href="produtos.html" class="nav-group-item">
+              <a href="produtos.html" class="nav-group-item active">
                 <span class="icon icon-download"></span>
                 Produtos
               </a>
@@ -35,23 +34,23 @@
             </nav>
           </div>
           <div class="pane">
-            <button type="button" @click="createClient()" class="btn btn-positive">Novo Cliente</button>
-          
+            <button type="button" @click="createProduct()" class="btn btn-positive">Novo produto</button>
+            
             <table class="table table-stripped">
               <thead>
                 <tr>
                   <th>Nome:</th>
-                  <th>CPF:</th>
-                  <th>Telefone:</th>
+                  <th>Preço:</th>
+                  <th>Quantidade:</th>
                   <th>Ação:</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="cliente in clientes">
-                    <td>{{ cliente.nome }}</td>
-                    <td>{{ cliente.cpf }}</td>
-                    <td>{{ cliente.telefone }}</td>
-                    <td><button type="button" class="btn btn-primary" @click="editClient(cliente)">Editar</button></td>
+                <tr v-for="produto in produtos">
+                    <td>{{ produto.nome }}</td>
+                    <td>{{ produto.preco }}</td>
+                    <td>{{ produto.quantidade }}</td>
+                    <td><button type="button" class="btn btn-primary" @click="editProduct(produto)">Editar</button></td>
                 </tr>
               </tbody>
             </table>
@@ -65,87 +64,75 @@
 
     <div id="modal" v-if="openModal">
       <div class="wrap">
-        <form action="" class="pane-body" id="cadastro-cliente">
-              <h3 v-if="mode == 'cadastro'">Cadastro de Cliente</h3>
-              <h3 v-if="mode == 'edicao'">Editar Cliente</h3>
+        <form action="" class="pane-body" id="cadastro-produto">
+              <h3 v-if="mode == 'cadastro'">Cadastro de Produto</h3>
+              <h3 v-if="mode == 'edicao'">Editar Produto</h3>
               <div class="form-group">
-                <input type="text" class="form-control" v-model="cliente.nome" placeholder="Nome" id="nome" />
+                <input type="text" class="form-control" v-model="produto.nome" placeholder="Nome" id="nome" />
               </div>
               <div class="form-group">
-                <input type="text" class="form-control" v-model="cliente.cpf" placeholder="CPF" id="cpf" />
+                <input type="text" class="form-control" v-model="produto.preco" placeholder="Preço" id="preco" />
               </div>
               <div class="form-group">
-                <input type="text" class="form-control" v-model="cliente.telefone" placeholder="Telefone" id="telefone" />
+                <input type="text" class="form-control" v-model="produto.quantidade" placeholder="Quantidade" id="quantidade" />
               </div>
-              <button type="button" class="btn btn-positive" @click="saveOrUpdateClient(cliente)" id="salvar">Salvar</button>
+              <button type="button" class="btn btn-positive" @click="saveOrUpdateProduct(produto)" id="salvar">Salvar</button>
               <button type="button" class="btn btn-negative" @click="openModal = false" id="fechar">Fechar</button>
             </form>
       </div>
     </div>
+      
   </body>
-    <script>
+  <script type="text/javascript">
       window.Vue = require('vue');
 
       var read = require('read-file-utf8');
       var loki = require('lokijs');
-
       var db = new loki('db.json');
-      var fileExists = require('file-exists');
-      var data = {};
+      var data = read(__dirname+'/db.json');
+      db.loadJSON(data);
 
-      if(fileExists(__dirname+'/db.json')){
-        data = read(__dirname+'/db.json');
-        db.loadJSON(data);
-
-      }else {
-        db.addCollection('clientes');
-        db.addCollection('vendas');
-        db.addCollection('produtos');
-        db.save();
-
-      } 
-
-      var clientes = db.getCollection('clientes');
-
+      var produtos = db.getCollection('produtos');
+            
       new Vue({
         el: 'body',
         data: {
           mode: '',
-          clientes: [],
-          cliente: {
+          produtos: [],
+          produto: {
             nome: '',
-            cpf: '',
-            telefone: ''
+            preco: 0.00,
+            quantidade: 0
           },
           openModal: false
         },
         ready: function(){
-          this.clientes = clientes.data;
+          this.produtos = produtos.data;
 
         },
         methods: {
-          editClient: function(cliente){
+          editProduct: function(produto){
               this.mode = 'edicao';
               this.openModal = true;
-              this.cliente = cliente;
+              this.produto = produto;
 
           },
-          createClient: function(){
+          createProduct: function(){
             this.mode = 'cadastro';
             this.openModal = true;
-            this.cliente = {
+            this.produto = {
                             nome: '',
-                            cpf: '',
-                            telefone: ''
+                            preco: 0.00,
+                            quantidade: 0
                            }; 
           },
-          saveOrUpdateClient : function(cliente){
+          saveOrUpdateProduct : function(produto){
             this.openModal = false;
-            if(cliente.$loki){
-              clientes.update(cliente);
+            if(produto.$loki){
+              produtos.update(produto);
 
             }else {
-              clientes.insert(cliente);
+              produtos.insert(produto);
 
             }
             db.save();
@@ -154,6 +141,5 @@
         
         }
       });
-      
-    </script>
+  </script>
 </html>

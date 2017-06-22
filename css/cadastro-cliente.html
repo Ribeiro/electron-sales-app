@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <meta charset="utf-8" />
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/photon.css">
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Electron Javascript -->
+    <!-- <script src="app.js" charset="utf-8"></script> -->
+  </head>
+
+  <body>
+    <div class="window">
+      <header class="toolbar toolbar-header">
+        <h1 class="title">Sistema de Vendas</h1>
+      </header>
+      <div class="window-content">
+        <div class="pane-group">
+          <div class="pane-sm sidebar">
+            Enchendo linguiça por enquanto
+          </div>
+          <div class="pane">
+            <form action="" class="pane-body" id="cadastro-cliente">
+              <h3>Cadastro de Cliente</h3>
+              <div class="form-group">
+                <input type="text" class="form-control" placeholder="Nome" id="nome">
+              </div>
+              <div class="form-group">
+                <input type="text" class="form-control" placeholder="CPF" id="cpf">
+              </div>
+              <div class="form-group">
+                <input type="text" class="form-control" placeholder="Telefone" id="telefone">
+              </div>
+              <button type="button" class="btn btn-positive" id="salvar">Salvar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+       <footer class="toolbar toolbar-footer">
+          <h1 class="title">Bedroom Tech Copyright 2016</h1>
+      </footer>
+    </div>
+  </body>
+    <script>
+        var loki = require('lokijs');
+        var db = new loki('db.json');
+        var clientes = db.addCollection('clientes');
+    </script>
+</html>

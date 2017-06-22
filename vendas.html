@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <title>vendas</title>
+    <meta charset="utf-8" />
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/photon.css">
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Electron Javascript -->
+    <script src="app.js" charset="utf-8"></script>
+  </head>
+  <body>
+          <div class="window">
+      <header class="toolbar toolbar-header">
+        <h1 class="title">Sistema de Vendas</h1>
+      </header>
+      <div class="window-content">
+        <div class="pane-group">
+          <div class="pane-sm sidebar">
+            <nav class="nav-group">
+              <a href="index.html" class="nav-group-item">
+                <span class="icon icon-home"></span>
+                Clientes
+              </a>
+              <a href="produtos.html" class="nav-group-item">
+                <span class="icon icon-download"></span>
+                Produtos
+              </a>
+              <a href="vendas.html" class="nav-group-item active">
+                <span class="icon icon-folder"></span>
+                Vendas
+              </a>
+            </nav>
+          </div>
+          <div class="pane">
+            <button type="button" @click="createSale()" class="btn btn-positive">Nova Venda</button>
+            
+            <table class="table table-stripped">
+              <thead>
+                <tr>
+                  <th>Cliente:</th>
+                  <th>Produto:</th>
+                  <th>Preço Unitário:</th>
+                  <th>Quantidade:</th>
+                  <th>Total:</th>
+                  <th>Ação:</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="venda in vendas">
+                    <td>{{ venda.$loki}}</td>
+                    <td>{{ venda.cliente }}</td>
+                    <td>{{ venda.produto }}</td>
+                    <td>{{ venda.preco_unitario }}</td>
+                    <td>{{ venda.quantidade }}</td>
+                    <td>{{ venda.preco_unitario * venda.quantidade }}</td>
+                    <td><button type="button" class="btn btn-primary" @click="editSale(venda)">Editar</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+       <footer class="toolbar toolbar-footer">
+          <h1 class="title">Bedroom Tech Copyright 2016</h1>
+      </footer>
+    </div>
+
+    <div id="modal" v-if="openModal">
+      <div class="wrap">
+        <form action="" class="pane-body" id="cadastro-venda">
+              <h3 v-if="mode == 'cadastro'">Cadastro de Venda</h3>
+              <h3 v-if="mode == 'edicao'">Editar Venda</h3>
+              <div class="form-group">
+                <select v-model="venda.cliente" class="form-control" name="lista-clientes" id="lista-clientes">
+                  <option value="{{ cliente.nome }}" v-for="cliente in clientes">{{ cliente.nome }}</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <select v-model="venda.produto" class="form-control" name="lista-produtos" id="lista-produto">
+                  <option value="{{ produto.nome }}" v-for="produto in produtos">{{ produto.nome }}</option>
+                </select>
+              </div>
+              <div class="form-group" v-if="mode == 'edicao'">
+                <input type="text" class="form-control" v-model="venda.preco_unitario" placeholder="Preço Unitário" id="preco_unitario" />
+              </div>
+              <div class="form-group">
+                <input type="text" class="form-control" v-model="venda.quantidade" placeholder="Quantidade" id="quantidade" />
+              </div>
+              <button type="button" class="btn btn-positive" @click="saveOrUpdateSale(venda)" id="salvar">Salvar</button>
+              <button type="button" class="btn btn-negative" @click="openModal = false" id="fechar">Fechar</button>
+            </form>
+      </div>
+    </div>
+      
+  </body>
+  <script type="text/javascript">
+      window.Vue = require('vue');
+
+      var read = require('read-file-utf8');
+      var loki = require('lokijs');
+      var db = new loki('db.json');
+      var data = read(__dirname+'/db.json');
+      db.loadJSON(data);
+
+      var vendas = db.getCollection('vendas');
+      var clientes = db.getCollection('clientes');
+      var produtos = db.getCollection('produtos');
+            
+      new Vue({
+        el: 'body',
+        data: {
+          mode: '',
+          vendas: [],
+          produtos: [],
+          clientes: [],
+          venda: {
+            cliente: '',
+            produto: '',
+            preco_unitario: 0.00,
+            quantidade: 1
+          },
+          openModal: false
+        },
+        ready: function(){
+          this.vendas = vendas.data;
+          this.clientes = clientes.data;
+          this.produtos = produtos.data;
+
+        },
+        methods: {
+          editSale: function(venda){
+              this.mode = 'edicao';
+              this.openModal = true;
+              this.venda = venda;
+
+          },
+          createSale: function(){
+            this.mode = 'cadastro';
+            this.openModal = true;
+            this.venda = {
+                            cliente: '',
+                            produto: '',
+                            preco_unitario: 0.00,
+                            quantidade: 1
+                           };
+
+          },
+          saveOrUpdateSale : function(venda){
+            if(venda.$loki){
+              vendas.update(venda);
+
+            }else {
+              venda.preco_unitario = produtos.find({nome: venda.produto})[0].preco;
+              vendas.insert(venda);
+
+            }
+            db.save();
+            this.openModal = false;
+
+          }
+        
+        }
+      });
+  </script>
+</html>
