@@ -22,6 +22,10 @@
               <nav class="nav-group">
               <a href="index.html" class="nav-group-item active">
                 <span class="icon icon-home"></span>
+                Home
+              </a>
+              <a href="clientes.html" class="nav-group-item">
+                <span class="icon icon-cloud"></span>
                 Clientes
               </a>
               <a href="produtos.html" class="nav-group-item">
@@ -34,28 +38,6 @@
               </a>
             </nav>
           </div>
-          <div class="pane">
-            <button type="button" @click="createClient()" class="btn btn-positive">Novo Cliente</button>
-          
-            <table class="table table-stripped">
-              <thead>
-                <tr>
-                  <th>Nome:</th>
-                  <th>CPF:</th>
-                  <th>Telefone:</th>
-                  <th>Ação:</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="cliente in clientes">
-                    <td>{{ cliente.nome }}</td>
-                    <td>{{ cliente.cpf }}</td>
-                    <td>{{ cliente.telefone }}</td>
-                    <td><button type="button" class="btn btn-primary" @click="editClient(cliente)">Editar</button></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
         </div>
       </div>
        <footer class="toolbar toolbar-footer">
@@ -63,97 +45,7 @@
       </footer>
     </div>
 
-    <div id="modal" v-if="openModal">
-      <div class="wrap">
-        <form action="" class="pane-body" id="cadastro-cliente">
-              <h3 v-if="mode == 'cadastro'">Cadastro de Cliente</h3>
-              <h3 v-if="mode == 'edicao'">Editar Cliente</h3>
-              <div class="form-group">
-                <input type="text" class="form-control" v-model="cliente.nome" placeholder="Nome" id="nome" />
-              </div>
-              <div class="form-group">
-                <input type="text" class="form-control" v-model="cliente.cpf" placeholder="CPF" id="cpf" />
-              </div>
-              <div class="form-group">
-                <input type="text" class="form-control" v-model="cliente.telefone" placeholder="Telefone" id="telefone" />
-              </div>
-              <button type="button" class="btn btn-positive" @click="saveOrUpdateClient(cliente)" id="salvar">Salvar</button>
-              <button type="button" class="btn btn-negative" @click="openModal = false" id="fechar">Fechar</button>
-            </form>
-      </div>
-    </div>
+
   </body>
-    <script>
-      window.Vue = require('vue');
 
-      var read = require('read-file-utf8');
-      var loki = require('lokijs');
-
-      var db = new loki('db.json');
-      var fileExists = require('file-exists');
-      var data = {};
-
-      if(fileExists(__dirname+'/db.json')){
-        data = read(__dirname+'/db.json');
-        db.loadJSON(data);
-
-      }else {
-        db.addCollection('clientes');
-        db.addCollection('vendas');
-        db.addCollection('produtos');
-        db.save();
-
-      } 
-
-      var clientes = db.getCollection('clientes');
-
-      new Vue({
-        el: 'body',
-        data: {
-          mode: '',
-          clientes: [],
-          cliente: {
-            nome: '',
-            cpf: '',
-            telefone: ''
-          },
-          openModal: false
-        },
-        ready: function(){
-          this.clientes = clientes.data;
-
-        },
-        methods: {
-          editClient: function(cliente){
-              this.mode = 'edicao';
-              this.openModal = true;
-              this.cliente = cliente;
-
-          },
-          createClient: function(){
-            this.mode = 'cadastro';
-            this.openModal = true;
-            this.cliente = {
-                            nome: '',
-                            cpf: '',
-                            telefone: ''
-                           }; 
-          },
-          saveOrUpdateClient : function(cliente){
-            this.openModal = false;
-            if(cliente.$loki){
-              clientes.update(cliente);
-
-            }else {
-              clientes.insert(cliente);
-
-            }
-            db.save();
-
-          }
-        
-        }
-      });
-      
-    </script>
 </html>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-    <title>Produtos</title>
+    <title>Clientes</title>
     <meta charset="utf-8" />
     <!-- Stylesheets -->
     <link rel="stylesheet" href="css/photon.css">
@@ -23,11 +23,11 @@
                 <span class="icon icon-home"></span>
                 Home
               </a>
-              <a href="clientes.html" class="nav-group-item">
+              <a href="clientes.html" class="nav-group-item active">
                 <span class="icon icon-home"></span>
                 Clientes
               </a>
-              <a href="produtos.html" class="nav-group-item active">
+              <a href="produtos.html" class="nav-group-item">
                 <span class="icon icon-download"></span>
                 Produtos
               </a>
@@ -38,23 +38,23 @@
             </nav>
           </div>
           <div class="pane">
-            <button type="button" @click="createProduct()" class="btn btn-positive">Novo produto</button>
-            
+            <button type="button" @click="createClient()" class="btn btn-positive">Novo Cliente</button>
+          
             <table class="table table-stripped">
               <thead>
                 <tr>
                   <th>Nome:</th>
-                  <th>Preço:</th>
-                  <th>Quantidade:</th>
+                  <th>CPF:</th>
+                  <th>Telefone:</th>
                   <th>Ação:</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="produto in produtos">
-                    <td>{{ produto.nome }}</td>
-                    <td>{{ produto.preco }}</td>
-                    <td>{{ produto.quantidade }}</td>
-                    <td><button type="button" class="btn btn-primary" @click="editProduct(produto)">Editar</button></td>
+                <tr v-for="cliente in clientes">
+                    <td>{{ cliente.nome }}</td>
+                    <td>{{ cliente.cpf }}</td>
+                    <td>{{ cliente.telefone }}</td>
+                    <td><button type="button" class="btn btn-primary" @click="editClient(cliente)">Editar</button></td>
                 </tr>
               </tbody>
             </table>
@@ -67,24 +67,24 @@
     </div>
 
     <div id="modal" v-if="openModal">
-      <div class="wrap">
-        <form action="" class="pane-body" id="cadastro-produto">
-              <h3 v-if="mode == 'cadastro'">Cadastro de Produto</h3>
-              <h3 v-if="mode == 'edicao'">Editar Produto</h3>
-              <div class="form-group">
-                <input type="text" class="form-control" v-model="produto.nome" placeholder="Nome" id="nome" />
-              </div>
-              <div class="form-group">
-                <input type="text" class="form-control" v-model="produto.preco" placeholder="Preço" id="preco" />
-              </div>
-              <div class="form-group">
-                <input type="text" class="form-control" v-model="produto.quantidade" placeholder="Quantidade" id="quantidade" />
-              </div>
-              <button type="button" class="btn btn-positive" @click="saveOrUpdateProduct(produto)" id="salvar">Salvar</button>
-              <button type="button" class="btn btn-negative" @click="openModal = false" id="fechar">Fechar</button>
-            </form>
+        <div class="wrap">
+          <form action="" class="pane-body" id="cadastro-cliente">
+                <h3 v-if="mode == 'cadastro'">Cadastro de Cliente</h3>
+                <h3 v-if="mode == 'edicao'">Editar Cliente</h3>
+                <div class="form-group">
+                  <input type="text" class="form-control" v-model="cliente.nome" placeholder="Nome" id="nome" />
+                </div>
+                <div class="form-group">
+                  <input type="text" class="form-control" v-model="cliente.cpf" placeholder="CPF" id="cpf" />
+                </div>
+                <div class="form-group">
+                  <input type="text" class="form-control" v-model="cliente.telefone" placeholder="Telefone" id="telefone" />
+                </div>
+                <button type="button" class="btn btn-positive" @click="saveOrUpdateClient(cliente)" id="salvar">Salvar</button>
+                <button type="button" class="btn btn-negative" @click="openModal = false" id="fechar">Fechar</button>
+              </form>
+        </div>
       </div>
-    </div>
       
   </body>
   <script type="text/javascript">
@@ -96,47 +96,48 @@
       var data = read(__dirname+'/db.json');
       db.loadJSON(data);
 
-      var produtos = db.getCollection('produtos');
+      var clientes = db.getCollection('clientes');
             
       new Vue({
         el: 'body',
         data: {
           mode: '',
-          produtos: [],
-          produto: {
+          clientes: [],
+          cliente: {
             nome: '',
-            preco: 0.00,
-            quantidade: 0
+            cpf: '',
+            telefone: ''
           },
           openModal: false
         },
         ready: function(){
-          this.produtos = produtos.data;
+          this.clientes = clientes.data;
 
         },
         methods: {
-          editProduct: function(produto){
+          editClient: function(cliente){
               this.mode = 'edicao';
               this.openModal = true;
-              this.produto = produto;
+              this.cliente = cliente;
 
           },
-          createProduct: function(){
+          createClient: function(){
             this.mode = 'cadastro';
             this.openModal = true;
-            this.produto = {
+            this.cliente = {
                             nome: '',
-                            preco: 0.00,
-                            quantidade: 0
+                            cpf: '',
+                            telefone: ''
                            }; 
           },
-          saveOrUpdateProduct : function(produto){
+          saveOrUpdateClient : function(cliente){
             this.openModal = false;
-            if(produto.$loki){
-              produtos.update(produto);
+            
+            if(cliente.$loki){
+              clientes.update(cliente);
 
             }else {
-              produtos.insert(produto);
+              clientes.insert(cliente);
 
             }
             db.save();
