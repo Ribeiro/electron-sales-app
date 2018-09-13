@@ -18,7 +18,8 @@
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "~1.6.2",
-    "electron-debug": "^1.5.0"
+    "electron-debug": "^1.5.0",
+    "electron-packager": "^12.1.2"
   },
   "dependencies": {
     "file-exists": "^4.0.0",
